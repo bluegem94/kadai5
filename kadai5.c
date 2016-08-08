@@ -61,10 +61,10 @@ int countdown_25ms_1 = 0;
 int countdown_25ms_2 = 0;
 int countdown_25ms_3 = 0;
 
-int countdown0 = 0;
-int countdown1 = 0;
-int countdown2 = 0;
-int countdown3 = 0;
+int countdown_500ms_0 = 0;
+int countdown_500ms_1 = 0;
+int countdown_500ms_2 = 0;
+int countdown_500ms_3 = 0;
 
 
 /*****************************************************************************
@@ -173,10 +173,6 @@ void runtime_clock(void)
 * adjust_button
 * Adjust time and calendar based on state and option
 *
-* Input:
-* int *countdown
-* Pointer to countdown value of button
-*       
 * int option
 * Option to increment or decrement
 * 1 : increment
@@ -184,7 +180,7 @@ void runtime_clock(void)
 *
 ******************************************************************************/
 
-void adjust_button(int *countdown, int option)
+void adjust_button(int option)
 {
   switch(state)
   {
@@ -308,7 +304,7 @@ void adjust_button(int *countdown, int option)
 
 void display_button_handler(void)
 {
-  if( (countdown0 > 0) && (countdown0 < 20) )
+  if( (countdown_500ms_0 > 0) && (countdown_500ms_0 < 20) )
   {
     switch(state)
     {
@@ -323,14 +319,14 @@ void display_button_handler(void)
       default:
       state = mode_display_clock;
     }
-    countdown0 = 0;
+    countdown_500ms_0 = 0;
   }
 }
 
 void set_button_handler(void)
 {
   //Condition <2s
-  if((countdown1 > 0) && (countdown1 < 80)){
+  if((countdown_500ms_1 > 0) && (countdown_500ms_1 < 80)){
     switch(state)
     {
       case mode_display_clock:
@@ -397,31 +393,31 @@ void set_button_handler(void)
 void up_button_handler(void)
 {
   //Condition <500ms
-  if( (countdown2 > 0) && (countdown2 < 20) )
+  if( (countdown_500ms_2 > 0) && (countdown_500ms_2 < 20) )
   {
-    adjust_button(&countdown2,1);
-    countdown2 = 0;
+    adjust_button(1);
+    countdown_500ms_2 = 0;
   }
   // > 500ms case
-  if( (countdown2 > 20) && (countdown2 % 4 == 0) )
+  if( (countdown_500ms_2 > 20) && (countdown_500ms_2 % 4 == 0) )
   {
-    adjust_button(&countdown2,1);
+    adjust_button(1);
   }
 }
 
 void down_button_handler(void)
 {
   //Condition <500ms
-  if( (countdown3 > 0) && (countdown3 < 20) )
+  if( (countdown_500ms_3 > 0) && (countdown_500ms_3 < 20) )
   {
-    adjust_button(&countdown3,2);
-    countdown3 = 0;
+    adjust_button(2);
+    countdown_500ms_3 = 0;
   }
 
   // > 500ms case
-  if( (countdown3 > 20) && (countdown3 %4 == 0) )
+  if( (countdown_500ms_3 > 20) && (countdown_500ms_3 %4 == 0) )
   {
-    adjust_button(&countdown3,2);
+    adjust_button(2);
   }
 }
 
@@ -484,13 +480,13 @@ void int_imia1(void)
   else
   {
     display_button_handler();
-    countdown0 = 0;
+    countdown_500ms_0 = 0;
   }
 
   if(countdown_25ms_0>4)
   {
     countdown_25ms_0 = 0;
-    countdown0++;
+    countdown_500ms_0++;
   }
 
   //Set button scan
@@ -501,13 +497,13 @@ void int_imia1(void)
   else
   {
     set_button_handler();
-    countdown1 = 0;
+    countdown_500ms_1 = 0;
   }
 
   if(countdown_25ms_1>4)
   {
     countdown_25ms_1 = 0;
-    countdown1++;
+    countdown_500ms_1++;
   }
 
   //Up button scan
@@ -518,16 +514,16 @@ void int_imia1(void)
   else
   {
     up_button_handler();
-    countdown2 = 0;
+    countdown_500ms_2 = 0;
   }
 
   if(countdown_25ms_2>4)
   {
     countdown_25ms_2 = 0;
-    countdown2++;
+    countdown_500ms_2++;
   }
 
-  if(!P4.DR.BIT.B7&&(countdown2>20))
+  if(!P4.DR.BIT.B7&&(countdown_500ms_2>20))
   {
     up_button_handler();
   }
@@ -540,16 +536,16 @@ void int_imia1(void)
   else
   {
     down_button_handler();
-    countdown3 = 0;
+    countdown_500ms_3 = 0;
   }
 
   if(countdown_25ms_3>4)
   {
     countdown_25ms_3 = 0;
-    countdown3++;
+    countdown_500ms_3++;
   }
 
-  if(!P4.DR.BIT.B6&&(countdown3>20))
+  if(!P4.DR.BIT.B6&&(countdown_500ms_3>20))
   {
     down_button_handler();
   }
@@ -571,7 +567,7 @@ void init_tim1(void)
 
   ITU1.TCR.BIT.CCLR    = 1;     //
   ITU1.TCR.BIT.TPSC    = 3;     //16MHz/8=2MHz
-  ITU1.GRA        =9999;        //2MHz/10000=200HzÅ => 5ms
+  ITU1.GRA        =9999;        //2MHz/10000=200Hz¬Å => 5ms
   ITU1.TIER.BIT.IMIEA = 1;      //IMFA
   ITU.TSTR.BIT.STR1 = 1;        //Start timer1
 }
@@ -587,7 +583,7 @@ void setup(void)
   lcd_string1(0," Team LSIVN");
 
   P5.DDR = 0xff;      //LED as output
-  P5.DR.BYTE = 0xff;  //LEDè value set
+  P5.DR.BYTE = 0xff;  //LED¬è value set
 
   DI;
   init_tim1();
